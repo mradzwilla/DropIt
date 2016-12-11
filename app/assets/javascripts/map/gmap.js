@@ -1,30 +1,36 @@
-function initMap(latitude, longitude) {
-	var currentPosition = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
+function initMap(pos) {
+    var latitude = parseFloat(pos.coords.latitude);
+    var longitude = parseFloat(pos.coords.longitude);
+	var currentPosition = {lat: latitude, lng: longitude};
+
 	var map = new google.maps.Map(document.getElementById('map'), {
-  		zoom: 15,
+  		zoom: 18,
  		center: currentPosition
 	});
-	var marker = new google.maps.Marker({
- 		position: currentPosition,
-  		map: map
-	});
+
+    var posts = gon.nearbyPosts
+
+    for (i=0;i<posts.length;i++){
+        makeMarker(posts[i], map)
+    }
+}
+
+function makeMarker(post, map){
+    markerPosition = {lat: post.latitude, lng: post.longitude}
+    var marker = new google.maps.Marker({
+        position: markerPosition,
+        map: map
+    });
 }
 
 function getLocation() {
+//This is assigned to the map callback in index.html.erb
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(initMap);
     } else {
         alert("Geolocation is not supported by this browser.");
     }
 }
-function showPosition(position) {
-    var result = "Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude;
-    console.log(result)
-    initMap(position.coords.latitude, position.coords.longitude)
-}
-
-getLocation();
 
 function getLocationForForm(){
     if (navigator.geolocation) {
@@ -50,6 +56,9 @@ function setUserLocation(position){
         }
     })
 }
+
 $(document).ready(function(){
+    getLocation();
     getLocationForForm();
+
 })

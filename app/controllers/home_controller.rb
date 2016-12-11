@@ -16,12 +16,21 @@ class HomeController < ApplicationController
 		@user_longitude = current_user.longitude
 
 		@nearby_posts = Post.near([@user_latitude, @user_longitude], 20)
-		@all_posts = Post.geocoded
 
-		@all_posts.each do |p|
-			puts p.content
-			puts p.distance_from([@user_latitude, @user_longitude])
+		@nearbyInfo = []
+		@nearby_posts.each do |post|
+			@nearbyInfo.push({
+				content: post.content,
+				postLatitude: post.latitude,
+				postLongitude: post.longitude,
+				user: post.user.fullname,
+				timestamp: post.created_at
+			})
 		end
+
+		gon.push({
+			nearbyPosts: @nearby_posts
+		})
 	end
 
 	def updateUserCoordinates

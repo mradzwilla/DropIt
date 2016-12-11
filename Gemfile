@@ -45,7 +45,9 @@ group :development do
   gem 'spring'
 end
 
+gem 'gon'
+
 gem 'geocoder'
 gem 'devise'
 gem 'omniauth'
-gem 'omniauth-facebook', '1.4.0'
+gem 'omniauth-facebook'

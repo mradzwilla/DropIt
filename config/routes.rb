@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   post "updateUserCoordinates" => "home#updateUserCoordinates", as: "coordinates"
   root 'home#signin'
 
-  devise_for :users, :controllers => { registrations: 'registrations' } #Overrides devise path to add first and last name to sign-up form
+  devise_for :users, :controllers => { :omniauth_callbacks => "callbacks", :registrations => 'registrations' } #Overrides devise path to add first and last name to sign-up form
   resources :posts
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
