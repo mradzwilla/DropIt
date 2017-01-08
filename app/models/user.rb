@@ -12,6 +12,12 @@ class User < ActiveRecord::Base
 	        user.uid = auth.uid
 	        user.email = auth.info.email || ""
 	        user.password = Devise.friendly_token[0,20]
+	        user.oauth_token = auth.credentials.token
+	        user.oauth_expires_at = Time.at(auth.credentials.expires_at)
+	        @user_info = user.facebook.get_object(:me, { fields: [:first_name, :last_name, :email]})
+	        user.first_name = @user_info['first_name']
+	        user.last_name = @user_info['last_name']
+	        user.email = @user_info['email']
 	     end
 	end
 
@@ -42,8 +48,8 @@ class User < ActiveRecord::Base
 		"#{first_name} #{last_name}"
 	end
 
-	# def facebook
-	# 	Koala::Facebook::API.new(oauth_token)
-	# end
+	def facebook
+		Koala::Facebook::API.new(oauth_token)
+	end
 
 end

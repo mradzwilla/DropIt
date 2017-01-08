@@ -2,7 +2,7 @@ class CallbacksController < Devise::OmniauthCallbacksController
 
     def all
     	puts request.env["omniauth.auth"]
-    	raise request.env["omniauth.auth"]['credentials']['token'].to_yaml
+    	# raise request.env["omniauth.auth"]['credentials']['token'].to_yaml
 
     	@user = User.from_omniauth(request.env["omniauth.auth"])
     	@request = request.env["omniauth.auth"]
