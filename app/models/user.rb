@@ -41,4 +41,9 @@ class User < ActiveRecord::Base
 	def fullname
 		"#{first_name} #{last_name}"
 	end
+
+	# def facebook
+	# 	Koala::Facebook::API.new(oauth_token)
+	# end
+
 end

@@ -1,11 +1,7 @@
 <% if @user.latitude && @user.longitude %>
 	<h1>My Map</h1>
-	<% @nearby_posts.each do |p| %>
-		<br>
-		<%= p.content %>
-		Written by: <%= p.user.fullname %> at <%= p.created_at %>
-		<br>
-	<% end %>
+	<div id="post_content">
+	</div>
 	<div id="map-container">
 		<div id="map"></div>
 	    <script async defer

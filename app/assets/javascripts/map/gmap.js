@@ -9,18 +9,32 @@ function initMap(pos) {
 	});
 
     var posts = gon.nearbyPosts
-
     for (i=0;i<posts.length;i++){
         makeMarker(posts[i], map)
     }
 }
 
 function makeMarker(post, map){
-    markerPosition = {lat: post.latitude, lng: post.longitude}
+    var markerPosition = {lat: post.latitude, lng: post.longitude}
     var marker = new google.maps.Marker({
         position: markerPosition,
-        map: map
+        map: map,
+        });
+
+    marker.addListener('click', function(){
+        displayInfo(post)
+    })
+    // createInfoWindow(post.content, map, marker)
+}
+
+function displayInfo(post){
+    $('#post_content').text(post.content)
+}
+function createInfoWindow(contentString, map, marker){
+    var infowindow = new google.maps.InfoWindow({
+    content: contentString
     });
+    infowindow.open(map, marker);
 }
 
 function getLocation() {
@@ -34,7 +48,7 @@ function getLocation() {
 
 function getLocationForForm(){
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(addLocationToForm);
+        navigator.geolocation.getCurrentPosition(addLocationToForm, function(){}, {enableHighAccuracy: true});
         navigator.geolocation.getCurrentPosition(setUserLocation);
     } else {
         alert("Geolocation is not supported by this browser.");
