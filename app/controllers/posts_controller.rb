@@ -1,22 +1,11 @@
 class PostsController < ApplicationController
 	def create
-		puts "whatever"
-		puts current_user.id
-
 		@user = current_user
 		@post = Post.create(content: user_params[:content], user_id: current_user.id, latitude: user_params[:latitude], longitude: user_params[:longitude])
-		@user.facebook.put_wall_post(@post.content)
-		puts user_params
-		puts @post.id
-		puts @post.user
-		puts @post.content
-
 		@post.save
-		if @post.save
-			puts "Success"
-		else
-			puts 'no Success'
-		end
+
+		#The following posts to the user's Facebook wall
+		@user.facebook.put_wall_post(@post.content)
 
 		redirect_to root_path
 	end

@@ -1,6 +1,6 @@
-function initMap(pos) {
-    var latitude = parseFloat(pos.coords.latitude);
-    var longitude = parseFloat(pos.coords.longitude);
+function initMap(position, posts) {
+    var latitude = parseFloat(position.coords.latitude);
+    var longitude = parseFloat(position.coords.longitude);
 	var currentPosition = {lat: latitude, lng: longitude};
 
 	var map = new google.maps.Map(document.getElementById('map'), {
@@ -8,9 +8,9 @@ function initMap(pos) {
  		center: currentPosition
 	});
 
-    var posts = gon.nearbyPosts
-    for (i=0;i<posts.length;i++){
-        makeMarker(posts[i], map)
+    var nearbyPosts = posts
+    for (i=0;i<nearbyPosts.length;i++){
+        makeMarker(nearbyPosts[i], map)
     }
 }
 
@@ -37,24 +37,6 @@ function createInfoWindow(contentString, map, marker){
     infowindow.open(map, marker);
 }
 
-function getLocation() {
-//This is assigned to the map callback in index.html.erb
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(initMap);
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
-}
-
-function getLocationForForm(){
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(addLocationToForm, function(){}, {enableHighAccuracy: true});
-        navigator.geolocation.getCurrentPosition(setUserLocation);
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
-}
-
 function addLocationToForm(position){
     $('#post_latitude').val(position.coords.latitude)
     $('#post_longitude').val(position.coords.longitude)
@@ -71,8 +53,37 @@ function setUserLocation(position){
     })
 }
 
-$(document).ready(function(){
-    getLocation();
-    getLocationForForm();
+function getNearbyPosts(coords){
+    //Receives coords as parameter to pass to initMap
+    //Get nearby posts. Call marker maker function on success
+    $.ajax({
+        url: "/getNearbyPosts",
+        type: "GET",
+        dataType: "JSON",
+        success: function(posts){
+            initMap(coords, posts)
+        },
+        error: function(){
+            console.log('Error in getNearbyPosts')
+        }
+    })
+}
+var getPosition = function (options) {
+    var deferred = $.Deferred();
 
+    navigator.geolocation.getCurrentPosition(
+        deferred.resolve,
+        deferred.reject
+    );
+
+    return deferred.promise();
+};
+
+$(document).ready(function(){
+    //Make ajax call to geolocation and perform following functions once coordinates are returned
+    getPosition().then(function(result){
+        setUserLocation(result);
+        addLocationToForm(result);
+        getNearbyPosts(result)
+    })
 })

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   get "index" => "home#index", as: "index"
   post "updateUserCoordinates" => "home#updateUserCoordinates", as: "coordinates"
+  get "getNearbyPosts" => "home#getNearbyPosts", as: "getNearbyPosts"
   root 'home#signin'
 
   devise_for :users, :controllers => { :omniauth_callbacks => "callbacks", :registrations => 'registrations' } #Overrides devise path to add first and last name to sign-up form
