@@ -9,9 +9,17 @@ function initMap(position, posts) {
 	});
 
     var nearbyPosts = posts
+    var markers = []
+
     for (i=0;i<nearbyPosts.length;i++){
-        makeMarker(nearbyPosts[i], map)
+        newMarker = makeMarker(nearbyPosts[i], map)
+        markers.push(newMarker)
     }
+
+    // The following will enable marker clusters. I need to figure out if I want them
+    // var markerCluster = new MarkerClusterer(map, markers,
+    //         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'}
+    // );
 }
 
 function makeMarker(post, map){
@@ -24,6 +32,7 @@ function makeMarker(post, map){
     marker.addListener('click', function(){
         displayInfo(post)
     })
+    return marker
     // createInfoWindow(post.content, map, marker)
 }
 

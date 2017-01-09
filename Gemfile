@@ -45,8 +45,6 @@ group :development do
   gem 'spring'
 end
 
-gem 'gon'
-
 gem 'geocoder'
 gem 'devise'
 gem 'omniauth'
