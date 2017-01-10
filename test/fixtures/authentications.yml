@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  provider: MyString
+  uid: MyString
+  token: MyString
+  secret: MyString
+  created_at: 2017-01-10 07:32:30
+  updated_at: 2017-01-10 07:32:30
+  profile_page: MyString
+
+two:
+  user_id: 1
+  provider: MyString
+  uid: MyString
+  token: MyString
+  secret: MyString
+  created_at: 2017-01-10 07:32:30
+  updated_at: 2017-01-10 07:32:30
+  profile_page: MyString

@@ -1,11 +1,9 @@
 class CallbacksController < Devise::OmniauthCallbacksController
 
     def all
-    	puts request.env["omniauth.auth"]
-        puts request.env["omniauth.auth"]['provider']
-    	# raise request.env["omniauth.auth"]['credentials']['token'].to_yaml
+        @current_user = current_user
 
-    	@user = User.from_omniauth(request.env["omniauth.auth"])
+    	@user = User.from_omniauth(request.env["omniauth.auth"], @current_user)
     	@request = request.env["omniauth.auth"]
 
     	if @user.persisted?
