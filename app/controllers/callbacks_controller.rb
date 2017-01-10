@@ -2,6 +2,7 @@ class CallbacksController < Devise::OmniauthCallbacksController
 
     def all
     	puts request.env["omniauth.auth"]
+        puts request.env["omniauth.auth"]['provider']
     	# raise request.env["omniauth.auth"]['credentials']['token'].to_yaml
 
     	@user = User.from_omniauth(request.env["omniauth.auth"])
@@ -17,4 +18,6 @@ class CallbacksController < Devise::OmniauthCallbacksController
     end
 
     alias_method :facebook, :all
+    alias_method :twitter, :all
+
 end

@@ -12,7 +12,7 @@
 	</div>
 
 	<%= form_for @post, html: {id: 'default_form'} do |f| %>
-		<%= f.label :content, "Facebook Form" %>
+		<%= f.label :content, "Regular Form" %>
 		<%= f.text_area :content %>
 		<%= f.hidden_field :provider, value: 'dropit' %>
 		<%= f.hidden_field :latitude %>
