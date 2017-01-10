@@ -11,8 +11,19 @@
 	    </script>
 	</div>
 
-	<%= form_for @post do |f| %>
+	<%= form_for @post, html: {id: 'default_form'} do |f| %>
+		<%= f.label :content, "Facebook Form" %>
 		<%= f.text_area :content %>
+		<%= f.hidden_field :provider, value: 'dropit' %>
+		<%= f.hidden_field :latitude %>
+		<%= f.hidden_field :longitude %>
+		<%= f.submit "Submit" %>
+	<% end  %>
+
+	<%= form_for @post, html: {id: 'facebook_form'} do |f| %>
+		<%= f.label :content, "Facebook Form" %>
+		<%= f.text_area :content %>
+		<%= f.hidden_field :provider, value: 'facebook' %>
 		<%= f.hidden_field :latitude %>
 		<%= f.hidden_field :longitude %>
 		<%= f.submit "Submit" %>

@@ -43,7 +43,6 @@ class HomeController < ApplicationController
 				content: post.content,
 				latitude: post.latitude,
 				longitude: post.longitude,
-				user: post.user.fullname,
 				timestamp: post.created_at
 			})
 		end
