@@ -51,3 +51,4 @@ gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'omniauth-twitter'
 gem "koala", "~> 2.2"
+gem "twitter"

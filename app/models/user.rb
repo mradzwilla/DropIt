@@ -5,12 +5,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :omniauth_providers => [:facebook, :twitter]
 
 	has_many :posts
-	has_many :authorizations
-	
-	# SOCIALS = {
-	# 	facebook: 'Facebook',
-	# 	twitter: 'Twitter'
-	# }
+	has_many :authentications
 
 	def self.from_omniauth(auth, current_user)
 	  authorization = Authentication.where(:provider => auth.provider, :uid => auth.uid.to_s, 
@@ -19,9 +14,9 @@ class User < ActiveRecord::Base
 
 	  #This is trying to save the profile URL. We should do that later via koala
 	  # authorization.profile_page = auth.info.urls.first.last unless authorization.persisted?
-	  
+	  puts "Top of controller"
 	  #Twitter only provides email via API with elevated permissions
-	  if authorization.user.blank? && :provider != 'twitter'
+	  if authorization.user.blank? && auth.provider != 'twitter'
 
 		@koala = Koala::Facebook::API.new(auth.credentials.token)
 	   	@user_info = @koala.get_object(:me, { fields: [:first_name, :last_name, :email]})
@@ -39,9 +34,38 @@ class User < ActiveRecord::Base
 	    authorization.user = user
 	    authorization.save
 	  end
-	  authorization.user
-	end
+	  
+	  if authorization.user.blank? && auth.provider == 'twitter'
+	  	@uid = auth.uid
+	  	@existing_record = Authentication.where(:provider => 'twitter', :uid => @uid).first
+	  	@user_record = @existing_record.blank? ? User.new : @existing_record.user
+	  	user = current_user.nil? ? @user_record : current_user
+	  	if user.new_record?
+	  	  user.password = Devise.friendly_token[0, 20]
+	  	  #Twitter only returns full name
+	  	  @fullname = auth['info']['name'].split(' ')
+	  	  user.first_name = @fullname[0]
+	  	  user.last_name = @fullname[1]
+	  	  puts "OKOKOKOK"
+	  	  puts user.id
+	  	  authorization.save
+	      # authorization.user = user
+	      puts "SOMETHING"
+	      # puts authorization.user.first_name
+	      authorization.save
+	      user.authentications << authorization
+	      user.save
+	      #This shows up blank and I don't know why
+	      puts "HEREEEE"
+	  	  puts user.authentications
 
+	  	else
+	      authorization.user = user
+	      authorization.save
+	   end
+	end
+	authorization.user
+end
 	def self.new_with_session(params, session)
 		if session["devise.user_attributes"]
 			new(session["devise.user_attributes"], without_protection: true) do |user|
@@ -54,7 +78,12 @@ class User < ActiveRecord::Base
 	end
 
 	def password_required?
-		super && provider.blank?
+		puts "Password method - Q"
+		puts authentications
+		puts authentications.exists?
+		puts authentications.blank?
+		puts (super && authentications.blank?)
+		false
 	end
 
 	def update_with_password(params, *options)
@@ -70,7 +99,17 @@ class User < ActiveRecord::Base
 	end
 
 	def facebook
-		Koala::Facebook::API.new(oauth_token)
+		@oauth_token = authentications.where(:provider => 'facebook').first.token
+		Koala::Facebook::API.new(@oauth_token)
 	end
 
+	def twitter
+		@oauth_credentials = authentications.where(:provider => 'twitter').first
+		client = Twitter::REST::Client.new do |config|
+		  config.consumer_key        = ENV["TWITTER_ID"]
+		  config.consumer_secret     = ENV["TWITTER_SECRET"]
+		  config.access_token        = @oauth_credentials.token
+		  config.access_token_secret = @oauth_credentials.secret
+		end
+	end
 end
