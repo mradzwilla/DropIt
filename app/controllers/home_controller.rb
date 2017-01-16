@@ -11,6 +11,12 @@ class HomeController < ApplicationController
 	def index
 		@user = current_user
 		@post = Post.new
+
+		@user_facebook = @user.authentications.where(:provider => 'facebook').exists?
+		puts @user_facebook
+		@user_twitter = @user.authentications.where(:provider => 'twitter').exists?
+		puts @user_twitter
+
 	end
 
 	def updateUserCoordinates

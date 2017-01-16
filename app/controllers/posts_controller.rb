@@ -10,7 +10,12 @@ class PostsController < ApplicationController
 			@post_id = @post_id['id']
 			@post.update(external_id: @post_id)
 		end
-		
+
+		if @provider == 'twitter'
+			@post_id = @user.twitter.update(@post.content)
+			puts @post_id
+			@post.update(external_id: @post_id)
+		end
 		@post.save
 		redirect_to root_path
 	end

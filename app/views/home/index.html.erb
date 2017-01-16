@@ -1,4 +1,3 @@
-<% if @user.latitude && @user.longitude %>
 	<h1>My Map</h1>
 	<div id="post_content">
 	</div>
@@ -20,6 +19,7 @@
 		<%= f.submit "Submit" %>
 	<% end  %>
 
+	<% if @user_facebook %>
 	<%= form_for @post, html: {id: 'facebook_form'} do |f| %>
 		<%= f.label :content, "Facebook Form" %>
 		<%= f.text_area :content %>
@@ -27,8 +27,21 @@
 		<%= f.hidden_field :latitude %>
 		<%= f.hidden_field :longitude %>
 		<%= f.submit "Submit" %>
+		<% end  %>
+	<% else %>
+		<%= link_to "Sign in with Facebook", user_facebook_omniauth_authorize_path %><br />	
 	<% end  %>
-<% else %>
-	<br>
-	Please wait while we see what's going on around you.
-<% end %>
+
+	<% if @user_twitter %>
+	<%= form_for @post, html: {id: 'twitter_form'} do |f| %>
+		<%= f.label :content, "Twitter Form" %>
+		<%= f.text_area :content %>
+		<%= f.hidden_field :provider, value: 'twitter' %>
+		<%= f.hidden_field :latitude %>
+		<%= f.hidden_field :longitude %>
+		<%= f.submit "Submit" %>
+		<% end  %>
+	<% else %>
+		<%= link_to "Sign in with Twitter", user_twitter_omniauth_authorize_path %><br />
+	<% end  %>
+

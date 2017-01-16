@@ -4,8 +4,15 @@ class User < ActiveRecord::Base
  	devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable, :omniauth_providers => [:facebook, :twitter]
 
+    after_create :create_authentication_association
 	has_many :posts
 	has_many :authentications
+
+	def create_authentication_association
+		#This will create an association between new users who sign up via Twitter and their auth model
+		@authentications = Authentication.where(:provider => 'twitter', :token => oauth_token).first
+		@authentications.update(user_id: id) if !@authentications.nil?
+	end
 
 	def self.from_omniauth(auth, current_user)
 	  authorization = Authentication.where(:provider => auth.provider, :uid => auth.uid.to_s, 
@@ -40,6 +47,7 @@ class User < ActiveRecord::Base
 	  	@uid = auth.uid
 	  	@existing_record = Authentication.where(:provider => 'twitter', :uid => @uid).first
 	  	@user_record = @existing_record.blank? ? User.new : @existing_record.user
+
 	  	user = current_user.nil? ? @user_record : current_user
 	  	if user.new_record?
 	  	  user.password = Devise.friendly_token[0, 20]
@@ -48,16 +56,24 @@ class User < ActiveRecord::Base
 	  	  @fullname = auth['info']['name'].split(' ')
 	  	  user.first_name = @fullname[0]
 	  	  user.last_name = @fullname[1]
+	  	  user.oauth_token = auth.credentials.token
+	  	  user.authentications << authorization
+	  	  user.save
 	      authorization.save
-	      user.authentications << authorization
-	      user.save
 	  	else
 	      authorization.user = user
 	      authorization.save
 	   end
 	end
 	authorization.user
-end
+	end
+
+	def new_authentication(auth, user_id)
+		Authentication.create(:provider => auth.provider, :uid => auth.uid.to_s, 
+	                          :token => auth.credentials.token, 
+	                          :secret => auth.credentials.secret, :user_id => user_id)
+	end
+
 	def self.new_with_session(params, session)
 		if session["devise.user_attributes"]
 			new(session["devise.user_attributes"], without_protection: true) do |user|
@@ -70,8 +86,11 @@ end
 	end
 
 	def password_required?
-		#Will return false if oath_relationship exists
-		super && (oath_relationship == false)
+		if oath_relationship == true
+			return false
+		else 
+			super
+		end
 	end
 
 
@@ -94,6 +113,7 @@ end
 
 	def twitter
 		@oauth_credentials = authentications.where(:provider => 'twitter').first
+
 		client = Twitter::REST::Client.new do |config|
 		  config.consumer_key        = ENV["TWITTER_ID"]
 		  config.consumer_secret     = ENV["TWITTER_SECRET"]
