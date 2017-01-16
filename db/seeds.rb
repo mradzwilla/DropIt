@@ -6,7 +6,7 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-	me = User.create!(email: "mradzwilla@gmail.com", first_name: "Mike", last_name: "Radzwilla", password: "123456")
+	me = User.create!(email: "mradzwilla@aol.com", first_name: "Mike", last_name: "Radzwilla", password: "123456")
 	me.posts.create(latitude: 41.182522399999996, longitude: -75.9431374, content: "Hello", created_at: "2016-11-07 06:03:32 UTC")
 	me.posts.create(latitude: 41.182522399999996, longitude: -75.9431374, content: "Is it me you're looking for?", created_at: "2016-11-07 06:03:32 UTC")
 

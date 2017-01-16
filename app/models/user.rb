@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
 	  # authorization.profile_page = auth.info.urls.first.last unless authorization.persisted?
 	  puts "Top of controller"
 	  #Twitter only provides email via API with elevated permissions
-	  if authorization.user.blank? && auth.provider != 'twitter'
+	  if authorization.user.blank? && auth.provider == 'facebook'
 
 		@koala = Koala::Facebook::API.new(auth.credentials.token)
 	   	@user_info = @koala.get_object(:me, { fields: [:first_name, :last_name, :email]})
@@ -29,6 +29,7 @@ class User < ActiveRecord::Base
           user.first_name = @user_info['first_name']
           user.last_name = @user_info['last_name']
           user.email = @user_info['email']
+          user.oath_relationship = true
 	      user.save
 	    end
 	    authorization.user = user
@@ -42,23 +43,14 @@ class User < ActiveRecord::Base
 	  	user = current_user.nil? ? @user_record : current_user
 	  	if user.new_record?
 	  	  user.password = Devise.friendly_token[0, 20]
+	  	  user.oath_relationship = true
 	  	  #Twitter only returns full name
 	  	  @fullname = auth['info']['name'].split(' ')
 	  	  user.first_name = @fullname[0]
 	  	  user.last_name = @fullname[1]
-	  	  puts "OKOKOKOK"
-	  	  puts user.id
-	  	  authorization.save
-	      # authorization.user = user
-	      puts "SOMETHING"
-	      # puts authorization.user.first_name
 	      authorization.save
 	      user.authentications << authorization
 	      user.save
-	      #This shows up blank and I don't know why
-	      puts "HEREEEE"
-	  	  puts user.authentications
-
 	  	else
 	      authorization.user = user
 	      authorization.save
@@ -78,13 +70,10 @@ end
 	end
 
 	def password_required?
-		puts "Password method - Q"
-		puts authentications
-		puts authentications.exists?
-		puts authentications.blank?
-		puts (super && authentications.blank?)
-		false
+		#Will return false if oath_relationship exists
+		super && (oath_relationship == false)
 	end
+
 
 	def update_with_password(params, *options)
 		if encrypted_password.blank?
